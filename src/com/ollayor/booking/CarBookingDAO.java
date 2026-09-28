@@ -9,7 +9,7 @@ public class CarBookingDAO {
     public void addBooking(CarBooking booking) {
         int bookingCount = 0;
         for (int i = 0; i < bookings.length; i++) {
-            if (bookings[i] != null){
+            if (bookings[i] != null) {
                 bookingCount++;
             }
         }
@@ -34,31 +34,25 @@ public class CarBookingDAO {
         CarBooking[] allBookings = getBookings();
 
         boolean find = false;
-        for (CarBooking booking : allBookings) {
-            if (booking != null && booking.getId().equals(id)) {
-                booking.getCar().setBooked(false);
+        for (int i = 0; i < allBookings.length; i++) {
+            if (allBookings[i] != null && allBookings[i].getId().equals(id)) {
+                allBookings[i].getCar().setBooked(false);
+                allBookings[i] = null;
                 find = true;
             }
         }
+
         if (!find) {
             throw new IllegalArgumentException("Not Found booking with id: " + id);
         }
 
-        int count = 0;
+        int index = 0;
         for (CarBooking booking : allBookings) {
             if (booking != null && !booking.getId().equals(id)) {
-                count++;
+                allBookings[index++] = booking;
             }
         }
-        CarBooking[] carBookings = new CarBooking[count];
-        int index = 0;
-        for (CarBooking booking : getBookings()) {
-            if (booking != null && !booking.getId().equals(id)) {
-                carBookings[index++] = booking;
-            }
-        }
-        this.bookings = carBookings;
-
+        this.bookings = allBookings;
     }
 
 }

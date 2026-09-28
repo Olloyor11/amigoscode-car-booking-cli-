@@ -36,21 +36,26 @@ public class CarBookingService {
         if (startDate.isAfter(endDate) ||
                 startDate.isBefore(LocalDate.now()) ||
                 endDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Wrong date inserted");
+            System.out.println("Wrong date inserted");
         }
         CarBooking[] bookings = carBookingDAO.getBookings();
         for (CarBooking booking : bookings) {
             if (booking != null && booking.getStatus().equals(BookingStatus.ACTIVE) && booking.getCar().getId().equals(carId)) {
-                throw new IllegalArgumentException("This car is already booked");
+                System.out.println("This car is already booked");
             }
         }
-        long bookingPeriod = ChronoUnit.DAYS.between(startDate, endDate);
+        long bookingPeriod;
+        if (startDate.equals(endDate)){
+            bookingPeriod = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        }else {
+            bookingPeriod = ChronoUnit.DAYS.between(startDate, endDate);
+        }
         BigDecimal priceForBookingPeriod = BigDecimal.valueOf(bookingPeriod).
                 multiply(carById.getRentalPricePerDay());
 
         CarBooking carBooking =
                 new CarBooking(UUID.randomUUID(), userById, carById,
-                        startDate, endDate, priceForBookingPeriod, BookingStatus.ACTIVE, bookedAt = LocalDateTime.now());
+                        startDate, endDate, priceForBookingPeriod, BookingStatus.ACTIVE, bookedAt);
 
         carById.setBooked(true);
         carBookingDAO.addBooking(carBooking);
@@ -97,6 +102,10 @@ public class CarBookingService {
         }
         return userBooking;
 
+    }
+
+    public void cancelBooking(UUID id){
+        carBookingDAO.deleteBooking(id);
     }
 
 }

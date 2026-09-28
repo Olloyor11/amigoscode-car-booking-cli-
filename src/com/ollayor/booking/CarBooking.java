@@ -100,13 +100,14 @@ public class CarBooking {
     @Override
     public String toString() {
         return "CarBooking{" +
-                "id=" + id +
-                ", user=" + user +
-                ", car=" + car +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", status=" + status +
-                ", bookedAt=" + bookedAt +
+                "id= " + id +
+                ", user= " + user +
+                ", car= " + car +
+                ", startDate= " + startDate +
+                ", endDate= " + endDate +
+                ", status= " + status +
+                ", bookedAt= " + bookedAt +
+                ", priceOfBooking= " + priceOfBooking +
                 '}';
     }
 
