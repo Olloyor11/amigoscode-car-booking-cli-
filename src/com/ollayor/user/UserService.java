@@ -1,5 +1,6 @@
 package com.ollayor.user;
 
+
 import java.util.UUID;
 
 public class UserService {
@@ -9,16 +10,17 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public User[] getAllUsers(){
+    public User[] getAllUsers() {
         return userDAO.getUsers();
     }
 
     public User findUserById(UUID id){
-        for (User user : userDAO.getUsers()) {
-            if (user.getId().equals(id)){
-                return user;
-            }
+        User user = userDAO.findUserById(id);
+
+        if (user == null){
+            throw new IllegalArgumentException("User Not Found");
         }
-        throw new IllegalArgumentException("User Not Found");
+        return user;
     }
+
 }

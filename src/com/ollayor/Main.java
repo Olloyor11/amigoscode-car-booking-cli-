@@ -1,21 +1,32 @@
-import com.ollayor.booking.CarBooking;
-import com.ollayor.booking.CarBookingDAO;
-import com.ollayor.booking.CarBookingService;
+import com.ollayor.booking.*;
 import com.ollayor.car.Car;
+import com.ollayor.car.CarArrayDataAccessService;
 import com.ollayor.car.CarDAO;
 import com.ollayor.car.CarService;
 import com.ollayor.user.User;
+import com.ollayor.user.UserArrayDataAccessService;
 import com.ollayor.user.UserDAO;
 import com.ollayor.user.UserService;
 
 void main() {
 
-    UserDAO userDAO = new UserDAO();
-    CarDAO carDAO = new CarDAO();
-    CarBookingDAO carBookingDAO = new CarBookingDAO();
-    UserService userService = new UserService(userDAO);
+
+
+    CarDAO carDAO = new CarArrayDataAccessService();
     CarService carService = new CarService(carDAO);
-    CarBookingService carBookingService = new CarBookingService(carBookingDAO, userService, carService);
+
+    UserDAO userDAO = new UserArrayDataAccessService();
+    UserService userService = new UserService(userDAO);
+
+    //    CarBookingDAO carBookingDAO = new CarBookingArrayDataAccessService();
+    CarBookingDAO carBookingDAO =
+            new CarBookingFileDataAccessService("bookings.dat");
+
+    CarBookingService carBookingService =
+            new CarBookingService(
+                    carBookingDAO,
+                    userService,
+                    carService);
 
 
     System.out.println();
@@ -56,7 +67,7 @@ void main() {
                     continue;
                 }
                 try {
-                    userService.findUserById(userid);
+                    userDAO.findUserById(userid);
                     break;
                 } catch (IllegalArgumentException e) {
                     System.out.println("There is no user with id: " + userid);
@@ -73,7 +84,7 @@ void main() {
 
 
             UUID carid;
-            Car car = null;
+            Car car;
             while (true) {
                 System.out.println("\nPlease enter your selected car id number!");
                 try {
@@ -84,7 +95,7 @@ void main() {
                     continue;
                 }
                 try {
-                    car = carService.getCarById(carid);
+                    car = carService.findCarById(carid);
                     boolean bookedAlready = false;
                     for (CarBooking booking : carBookingService.getAllBookings()) {
                         if (booking != null &&

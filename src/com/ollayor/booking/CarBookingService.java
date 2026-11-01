@@ -17,7 +17,13 @@ public class CarBookingService {
     private final UserService userService;
     private final CarService carService;
 
-    public CarBookingService(CarBookingDAO carBookingDAO, UserService userService, CarService carService) {
+
+    public CarBookingService(
+
+            CarBookingDAO carBookingDAO,
+            UserService userService,
+            CarService carService) {
+
         this.carBookingDAO = carBookingDAO;
         this.userService = userService;
         this.carService = carService;
@@ -31,7 +37,7 @@ public class CarBookingService {
             LocalDateTime bookedAt) {
 
         User userById = userService.findUserById(userId);
-        Car carById = carService.getCarById(carId);
+        Car carById = carService.findCarById(carId);
 
         if (startDate.isAfter(endDate) ||
                 startDate.isBefore(LocalDate.now()) ||
@@ -45,9 +51,9 @@ public class CarBookingService {
             }
         }
         long bookingPeriod;
-        if (startDate.equals(endDate)){
+        if (startDate.equals(endDate)) {
             bookingPeriod = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-        }else {
+        } else {
             bookingPeriod = ChronoUnit.DAYS.between(startDate, endDate);
         }
         BigDecimal priceForBookingPeriod = BigDecimal.valueOf(bookingPeriod).
@@ -75,7 +81,7 @@ public class CarBookingService {
         CarBooking[] allBooking = new CarBooking[count];
         int index = 0;
         for (CarBooking booking : bookings) {
-            if (booking != null ){
+            if (booking != null) {
                 allBooking[index++] = booking;
             }
         }
@@ -96,7 +102,7 @@ public class CarBookingService {
         CarBooking[] userBooking = new CarBooking[count];
         int index = 0;
         for (CarBooking booking : bookings) {
-            if (booking != null && booking.getUser().getId().equals(userId)){
+            if (booking != null && booking.getUser().getId().equals(userId)) {
                 userBooking[index++] = booking;
             }
         }
@@ -104,7 +110,7 @@ public class CarBookingService {
 
     }
 
-    public void cancelBooking(UUID id){
+    public void cancelBooking(UUID id) {
         carBookingDAO.deleteBooking(id);
     }
 
