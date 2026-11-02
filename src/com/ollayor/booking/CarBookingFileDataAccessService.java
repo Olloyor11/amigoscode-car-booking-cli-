@@ -31,11 +31,13 @@ public class CarBookingFileDataAccessService implements CarBookingDAO {
     @Override
     public void addBooking(CarBooking booking) {
         CarBooking[] current = getBookings();
-        CarBooking[] updated = new CarBooking[current.length * 2];
+        CarBooking[] updated = new CarBooking[current.length + 1];
         for (int i = 0; i < current.length; i++) {
             updated[i] = current[i];
         }
         updated[current.length] = booking;
+        boolean booked = booking.getCar().isBooked();
+        booked = true;
         writeBookings(updated);
     }
 
