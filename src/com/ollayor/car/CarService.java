@@ -1,5 +1,7 @@
 package com.ollayor.car;
 
+import com.ollayor.user.User;
+
 import java.util.UUID;
 
 public class CarService {
@@ -8,19 +10,6 @@ public class CarService {
 
     public CarService(CarDAO carDAO) {
         this.carDAO = carDAO;
-    }
-
-    public Car[] getAllCars() {
-        return carDAO.getCars();
-    }
-
-    public Car getCarById(UUID id) {
-        for (Car car : carDAO.getCars()) {
-            if (car.getId().equals(id)) {
-                return car;
-            }
-        }
-        throw new IllegalArgumentException("Car Not Found");
     }
 
     public Car[] getAllAvailableCars() {
@@ -41,6 +30,15 @@ public class CarService {
         }
         return availableCars;
 
+    }
+
+    public Car findCarById(UUID id){
+        Car car = carDAO.getCarById(id);
+
+        if (car == null){
+            throw new IllegalArgumentException("Car Not Found");
+        }
+        return car;
     }
 
     public Car[] getAllAvailableElectricCars() {
