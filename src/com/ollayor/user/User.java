@@ -1,9 +1,10 @@
 package com.ollayor.user;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
     private UUID id;
     private String name;
 
