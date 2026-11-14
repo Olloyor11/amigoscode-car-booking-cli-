@@ -11,7 +11,6 @@ public class Car implements Serializable {
     private BigDecimal rentalPricePerDay;
     private Brand brand;
     private boolean isElectric;
-    private boolean isBooked;
 
     public Car(UUID id, String regNumber, BigDecimal rentalPricePerDay, Brand brand, boolean isElectric) {
         this.id = id;
@@ -19,7 +18,6 @@ public class Car implements Serializable {
         this.rentalPricePerDay = rentalPricePerDay;
         this.brand = brand;
         this.isElectric = isElectric;
-        this.isBooked = false;
     }
 
     public UUID getId() {
@@ -40,14 +38,6 @@ public class Car implements Serializable {
 
     public boolean isElectric() {
         return isElectric;
-    }
-
-    public boolean isBooked() {
-        return isBooked;
-    }
-
-    public void setBooked(boolean booked) {
-        isBooked = booked;
     }
 
 

@@ -2,6 +2,8 @@ package com.ollayor.car;
 
 import com.ollayor.user.User;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class CarService {
@@ -12,24 +14,8 @@ public class CarService {
         this.carDAO = carDAO;
     }
 
-    public Car[] getAllAvailableCars() {
-        Car[] cars = carDAO.getCars();
-        int count = 0;
-        for (Car car : cars) {
-            if (!car.isBooked()) {
-                count++;
-            }
-        }
-
-        Car[] availableCars = new Car[count];
-        int index = 0;
-        for (Car car : cars) {
-            if (!car.isBooked()) {
-                availableCars[index++] = car;
-            }
-        }
-        return availableCars;
-
+    public List<Car> getAllCars() {
+        return carDAO.getCars();
     }
 
     public Car findCarById(UUID id){
@@ -39,25 +25,5 @@ public class CarService {
             throw new IllegalArgumentException("Car Not Found");
         }
         return car;
-    }
-
-    public Car[] getAllAvailableElectricCars() {
-        Car[] cars = carDAO.getCars();
-        int count = 0;
-        for (Car car : cars) {
-            if (car.isElectric() && !car.isBooked()) {
-                count++;
-            }
-        }
-
-        Car[] electricCars = new Car[count];
-        int index = 0;
-        for (Car car : cars) {
-            if (car.isElectric() && !car.isBooked()) {
-                electricCars[index++] = car;
-            }
-        }
-        return electricCars;
-
     }
 }

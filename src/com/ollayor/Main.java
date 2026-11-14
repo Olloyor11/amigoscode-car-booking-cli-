@@ -77,11 +77,11 @@ void main() {
             }
 
 
-            Car[] allAvailableCars = carBookingService.getAllAvailableCars();
+            List<Car> allAvailableCars = carBookingService.getAllAvailableCars();
 
             System.out.println("\nAll available cars:\n");
-            for (int i = 0; i < allAvailableCars.length; i++) {
-                System.out.println(i + 1 + " - " + allAvailableCars[i]);
+            for (int i = 0; i < allAvailableCars.size(); i++) {
+                System.out.println(i + 1 + " - " + allAvailableCars.get(i));
             }
 
 
@@ -98,29 +98,15 @@ void main() {
                 }
                 try {
                     car = carService.findCarById(carid);
-                    boolean bookedAlready = false;
-                    for (CarBooking booking : carBookingService.getAllBookings()) {
-                        if (
-                                !carBookingService.isCarBooked(carid) &&
-                                        booking.getCar().getRegNumber().equalsIgnoreCase(car.getRegNumber())) {
-                            bookedAlready = true;
-                            break;
-                        }
-                    }
-                    if (bookedAlready) {
-                        System.out.println("You can not book this car!");
-                        System.out.println("This car already booked!");
-                        System.out.println("Choose another car!");
+                    if (carBookingService.isCarBooked(carid)) {
+                        System.out.println("This car is already booked! Choose another car!");
                         continue;
-
                     }
                     break;
+
                 } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid input");
-                    System.out.println("Try again!👇");
-
+                    System.out.println("Invalid input or booking not found. Try again!👇");
                 }
-
             }
 
             LocalDate startDate;
@@ -130,6 +116,8 @@ void main() {
                 try {
                     startDate = LocalDate.parse(scanner.nextLine());
                     break;
+
+
                 } catch (Exception e) {
                     System.out.println("Wrong format Try again!👇");
                     continue;
@@ -147,12 +135,19 @@ void main() {
                     continue;
                 }
             }
+            CarBooking carBooking;
 
+            try {
+                carBooking = carBookingService.bookCar(userid, carid, startDate, endDate, LocalDateTime.now());
 
-            CarBooking carBooking = carBookingService.bookCar(userid, carid, startDate, endDate, LocalDateTime.now());
+                System.out.println("You have booked " + carBooking.getCar().getBrand() +
+                        " with registration number - " + carBooking.getCar().getRegNumber() + " successfully!");
+                System.out.println("Your total booking cost is: " + carBooking.getPriceOfBooking());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
 
-            System.out.println("You have booked " + carBooking.getCar().getBrand() + " with registration number - " + carBooking.getCar().getRegNumber() + " successfully!");
-            System.out.println("Your total booking cost is: " + carBooking.getPriceOfBooking());
 
             UUID id = carBooking.getId();
             System.out.println("Your booking id is: " + id);
@@ -187,48 +182,48 @@ void main() {
                     continue;
                 }
             }
-            CarBooking[] userBookings = carBookingService.getUserBookings(userId);
+            List<CarBooking> userBookings = carBookingService.getUserBookings(userId);
             System.out.println("\nAll cars booked by you:\n");
-            if (userBookings.length == 0) {
+            if (userBookings.isEmpty()) {
                 System.out.println("No Active Booking Found");
             } else {
-                for (int i = 0; i < userBookings.length; i++) {
-                    System.out.println(i + 1 + " - " + userBookings[i]);
+                for (int i = 0; i < userBookings.size(); i++) {
+                    System.out.println(i + 1 + " - " + userBookings.get(i));
                 }
             }
         }
         if (nextInt == 4) {
             System.out.println("\nAll bookings:\n");
-            CarBooking[] allBookings = carBookingService.getAllBookings();
-            if (allBookings.length == 0) {
+            List<CarBooking> allBookings = carBookingService.getAllBookings();
+            if (allBookings.isEmpty()) {
                 System.out.println("There is no any Active bookings available!");
             }
-            for (int i = 0; i < allBookings.length; i++) {
-                System.out.println(i + 1 + " - " + allBookings[i]);
+            for (int i = 0; i < allBookings.size(); i++) {
+                System.out.println(i + 1 + " - " + allBookings.get(i));
             }
 
         }
         if (nextInt == 5) {
             System.out.println("\nAll Available Cars:\n");
-            Car[] allAvailableCars = carBookingService.getAllAvailableCars();
-            for (int i = 0; i < allAvailableCars.length; i++) {
-                System.out.println(i + 1 + " - " + allAvailableCars[i]);
+            List<Car> allAvailableCars = carBookingService.getAllAvailableCars();
+            for (int i = 0; i < allAvailableCars.size(); i++) {
+                System.out.println(i + 1 + " - " + allAvailableCars.get(i));
             }
 
         }
         if (nextInt == 6) {
             System.out.println("\nAll Available Electric Cars:\n");
-            Car[] allAvailableElectricCars = carBookingService.getAllAvailableElectricCars();
-            for (int i = 0; i < allAvailableElectricCars.length; i++) {
-                System.out.println(i + 1 + " - " + allAvailableElectricCars[i]);
+            List<Car> allAvailableElectricCars = carBookingService.getAllAvailableElectricCars();
+            for (int i = 0; i < allAvailableElectricCars.size(); i++) {
+                System.out.println(i + 1 + " - " + allAvailableElectricCars.get(i));
             }
 
         }
         if (nextInt == 7) {
             System.out.println("All Users");
-            User[] allUsers = userService.getAllUsers();
-            for (int i = 0; i < allUsers.length; i++) {
-                System.out.println(i + 1 + " - " + allUsers[i]);
+            List<User> allUsers = userService.getAllUsers();
+            for (int i = 0; i < allUsers.size(); i++) {
+                System.out.println(i + 1 + " - " + allUsers.get(i));
             }
 
         }

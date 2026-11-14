@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 public class CarBookingService {
@@ -39,21 +40,15 @@ public class CarBookingService {
         User userById = userService.findUserById(userId);
         Car carById = carService.findCarById(carId);
 
-        if (
-                startDate.isAfter(endDate) ||
-                startDate.isBefore(LocalDate.now()) ||
-                endDate.isBefore(LocalDate.now())) {
+        if (startDate.isAfter(endDate) ||
+                        startDate.isBefore(LocalDate.now()) ||
+                        endDate.isBefore(LocalDate.now())) {
 
-            System.out.println("Wrong date inserted");
+            throw new IllegalArgumentException("Wrong date inserted");
         }
-//        CarBooking[] bookings = carBookingDAO.getBookings();
-//        for (CarBooking booking : bookings) {
-//            if (booking != null && booking.getStatus().equals(BookingStatus.ACTIVE) && booking.getCar().getId().equals(carId)) {
-//                System.out.println("This car is already booked");
-//            }
-//        }
-        if (isCarBooked(carId)){
-            System.out.println("This car is already booked");
+
+        if (isCarBooked(carId)) {
+            throw new IllegalArgumentException("This car is already booked");
         }
 
         long bookingPeriod;
@@ -72,102 +67,52 @@ public class CarBookingService {
                 new CarBooking(UUID.randomUUID(), userById, carById,
                         startDate, endDate, priceForBookingPeriod, BookingStatus.ACTIVE, bookedAt);
 
-        carById.setBooked(true);
         carBookingDAO.addBooking(carBooking);
         return carBooking;
     }
 
-    public Car[] getAllAvailableCars() {
-        Car[] cars = carService.getAllAvailableCars();
-        int count = 0;
-        for (Car car : cars) {
-            if (!isCarBooked(car.getId())) {
-                count++;
-            }
-        }
-
-        Car[] availableCars = new Car[count];
-        int index = 0;
-        for (Car car : cars) {
-            if (!isCarBooked(car.getId())) {
-                availableCars[index++] = car;
-            }
-        }
-        return availableCars;
-
+    public List<Car> getAllAvailableCars() {
+        return carService.getAllCars()
+                .stream()
+                .filter(car -> !isCarBooked(car.getId()))
+                .toList();
     }
 
-    public Car[] getAllAvailableElectricCars() {
-        Car[] cars = carService.getAllAvailableElectricCars();
-        int count = 0;
-        for (Car car : cars) {
-            if (car.isElectric() && !isCarBooked(car.getId())) {
-                count++;
-            }
-        }
-
-        Car[] electricCars = new Car[count];
-        int index = 0;
-        for (Car car : cars) {
-            if (car.isElectric() && !isCarBooked(car.getId())) {
-                electricCars[index++] = car;
-            }
-        }
-        return electricCars;
-
+    public List<Car> getAllAvailableElectricCars() {
+        return carService.getAllCars()
+                .stream()
+                .filter(car -> !isCarBooked(car.getId()))
+                .filter(Car::isElectric)
+                .toList();
     }
 
     public boolean isCarBooked(UUID id) {
-        for (CarBooking booking : getAllBookings()) {
-            if (
-                    booking != null &&
-                    booking.getStatus() == BookingStatus.ACTIVE &&
-                    booking.getCar().getId().equals(id)){
-                return true;
-            }
+
+        if (getAllBookings().isEmpty()) {
+            return false;
         }
-        return false;
+
+        return getAllBookings()
+                .stream()
+                .anyMatch(
+                        booking -> booking.getStatus().equals(BookingStatus.ACTIVE) &&
+                                booking.getCar().getId().equals(id));
+
     }
 
 
-    public CarBooking[] getAllBookings() {
-        CarBooking[] bookings = carBookingDAO.getBookings();
-        int count = 0;
-        for (CarBooking booking : bookings) {
-            if (booking != null) {
-                count++;
-            }
-        }
-
-        CarBooking[] allBooking = new CarBooking[count];
-        int index = 0;
-        for (CarBooking booking : bookings) {
-            if (booking != null) {
-                allBooking[index++] = booking;
-            }
-        }
-        return allBooking;
+    public List<CarBooking> getAllBookings() {
+        return carBookingDAO.getBookings();
 
     }
 
-    public CarBooking[] getUserBookings(UUID userId) {
+    public List<CarBooking> getUserBookings(UUID userId) {
 
-        CarBooking[] bookings = carBookingDAO.getBookings();
-        int count = 0;
-        for (CarBooking booking : bookings) {
-            if (booking != null && booking.getUser().getId().equals(userId)) {
-                count++;
-            }
-        }
-
-        CarBooking[] userBooking = new CarBooking[count];
-        int index = 0;
-        for (CarBooking booking : bookings) {
-            if (booking != null && booking.getUser().getId().equals(userId)) {
-                userBooking[index++] = booking;
-            }
-        }
-        return userBooking;
+        List<CarBooking> bookings = carBookingDAO.getBookings();
+        return bookings
+                .stream()
+                .filter(booking -> booking.getUser().getId().equals(userId))
+                .toList();
 
     }
 
