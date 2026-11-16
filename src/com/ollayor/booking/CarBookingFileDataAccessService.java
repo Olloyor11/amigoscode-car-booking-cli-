@@ -1,6 +1,11 @@
 package com.ollayor.booking;
 
+import com.ollayor.car.Car;
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class CarBookingFileDataAccessService implements CarBookingDAO {
@@ -11,73 +16,49 @@ public class CarBookingFileDataAccessService implements CarBookingDAO {
         this.path = path;
     }
 
-    CarBooking[] bookings = new CarBooking[100];
-
-
+    @SuppressWarnings("unchecked")
     @Override
-    public CarBooking[] getBookings() {
+    public List<CarBooking> getBookings() {
         File file = new File(path);
         if (!file.exists()) {
-            return new CarBooking[0];
+            return new ArrayList<>();
         }
-        try (
-                ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (CarBooking[]) in.readObject();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<CarBooking>) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Could not read bookings from " + path, e);
         }
     }
-
     @Override
     public void addBooking(CarBooking booking) {
-        CarBooking[] current = getBookings();
-        CarBooking[] updated = new CarBooking[current.length + 1];
-        for (int i = 0; i < current.length; i++) {
-            updated[i] = current[i];
-        }
-        updated[current.length] = booking;
-        boolean booked = booking.getCar().isBooked();
-        booked = true;
-        writeBookings(updated);
+        List<CarBooking> bookings = getBookings();
+        bookings.add(booking);
+        writeBookings(bookings);
     }
 
 
     @Override
     public void deleteBooking(UUID id) {
-        CarBooking[] allBookings = getBookings();
-
-        boolean find = false;
-        for (int i = 0; i < allBookings.length; i++) {
-            if (allBookings[i] != null && allBookings[i].getId().equals(id)) {
-                allBookings[i].getCar().setBooked(false);
-                allBookings[i] = null;
-                find = true;
-            }
-        }
-
-        if (!find) {
-            throw new IllegalArgumentException("Not Found booking with id: " + id);
-        }
-
-        int index = 0;
-        for (CarBooking booking : allBookings) {
-            if (booking != null && !booking.getId().equals(id)) {
-                allBookings[index++] = booking;
-            }
-        }
-        this.bookings = allBookings;
+        List<CarBooking> allBookings = getBookings();
+        CarBooking carBooking = allBookings
+                .stream()
+                .filter(booking -> booking.getId().equals(id))
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Not Found booking with id: " + id));
+        carBooking.setStatus(BookingStatus.CANCELLED);
         writeBookings(allBookings);
 
     }
 
-    private void writeBookings(CarBooking[] bookings) {
+    private void writeBookings(List<CarBooking> bookings) {
         File file;
         try {
             file = new File(path);
-            if (!file.exists()){
+            if (!file.exists()) {
                 file.createNewFile();
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException();
         }
         try (

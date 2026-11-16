@@ -1,12 +1,13 @@
 package com.ollayor.booking;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CarBookingDAO  {
 
     void addBooking(CarBooking booking);
 
-    CarBooking[] getBookings();
+    List<CarBooking> getBookings();
 
     void deleteBooking(UUID id);
 
