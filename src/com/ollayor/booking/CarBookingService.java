@@ -10,7 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CarBookingService {
 
@@ -71,17 +73,17 @@ public class CarBookingService {
         return carBooking;
     }
 
-    public List<UUID> bookedCarsIds(){
-        List<UUID> bookedCars = getAllBookings()
+    public Set<UUID> bookedCarsIds(){
+        Set<UUID> bookedCars = getAllBookings()
                 .stream()
                 .filter(booking -> booking.getStatus().equals(BookingStatus.ACTIVE))
                 .map(booking -> booking.getCar().getId())
-                .toList();
+                .collect(Collectors.toSet());
         return bookedCars;
     }
 
     public List<Car> getAllAvailableCars() {
-        List<UUID> carsIds = bookedCarsIds();
+        Set<UUID> carsIds = bookedCarsIds();
         return carService.getAllCars()
                 .stream()
                 .filter(car -> !carsIds.contains(car.getId()))
@@ -89,7 +91,7 @@ public class CarBookingService {
     }
 
     public List<Car> getAllAvailableElectricCars() {
-        List<UUID> carsIds = bookedCarsIds();
+        Set<UUID> carsIds = bookedCarsIds();
         return carService.getAllCars()
                 .stream()
                 .filter(Car::isElectric)
