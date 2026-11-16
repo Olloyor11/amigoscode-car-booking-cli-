@@ -1,11 +1,12 @@
 package com.ollayor.booking;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CarBookingArrayDataAccessService implements CarBookingDAO {
 
-    private List<CarBooking> bookings;
+    private final List<CarBooking> bookings = new ArrayList<>();
 
     public void addBooking(CarBooking booking) {
         bookings.add(booking);

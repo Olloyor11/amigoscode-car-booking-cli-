@@ -71,18 +71,29 @@ public class CarBookingService {
         return carBooking;
     }
 
+    public List<UUID> bookedCarsIds(){
+        List<UUID> bookedCars = getAllBookings()
+                .stream()
+                .filter(booking -> booking.getStatus().equals(BookingStatus.ACTIVE))
+                .map(booking -> booking.getCar().getId())
+                .toList();
+        return bookedCars;
+    }
+
     public List<Car> getAllAvailableCars() {
+        List<UUID> carsIds = bookedCarsIds();
         return carService.getAllCars()
                 .stream()
-                .filter(car -> !isCarBooked(car.getId()))
+                .filter(car -> !carsIds.contains(car.getId()))
                 .toList();
     }
 
     public List<Car> getAllAvailableElectricCars() {
+        List<UUID> carsIds = bookedCarsIds();
         return carService.getAllCars()
                 .stream()
-                .filter(car -> !isCarBooked(car.getId()))
                 .filter(Car::isElectric)
+                .filter(car -> !carsIds.contains(car.getId()))
                 .toList();
     }
 
